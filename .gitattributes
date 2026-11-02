@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+# docs/drive/ es un espejo byte a byte del Drive: git no convierte finales de línea ahí,
+# o cada clon vería los .md "cambiados" y la sincronización los volvería a subir.
+docs/drive/** -text
+
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.docx binary
+*.pptx binary
+*.xlsx binary

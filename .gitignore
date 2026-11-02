@@ -1,0 +1,21 @@
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Local de cada máquina (agentes)
+.claude/settings.local.json
+CLAUDE.local.md
+.worktrees/
+.claude/worktrees/
+.superpowers/
+
+# Estado de rclone bisync (lo crea scripts/drive-sync.sh)
+scripts/*.md5
+
+# Sistema / dependencias
+node_modules/
+.datos/
+Thumbs.db
+.DS_Store
+desktop.ini
