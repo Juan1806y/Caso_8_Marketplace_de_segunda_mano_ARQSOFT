@@ -1,0 +1,14 @@
+{
+  "name": "marketplace-escenario-qa3",
+  "version": "1.0.0",
+  "description": "Escenario QA-3: el aviso al destinatario ausente no se pierde ni se duplica aunque el proveedor de notificaciones caiga",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "test": "node --env-file=config/normal.env --test --test-reporter=spec test/escenario-qa3.test.js",
+    "test:falla": "node --env-file=config/falla.env --test --test-reporter=spec test/escenario-qa3.test.js"
+  }
+}
