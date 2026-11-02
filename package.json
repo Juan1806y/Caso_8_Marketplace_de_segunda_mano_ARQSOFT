@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "node --env-file=config/normal.env --test --test-reporter=spec test/escenario-qa3.test.js",
-    "test:falla": "node --env-file=config/falla.env --test --test-reporter=spec test/escenario-qa3.test.js"
+    "test:falla": "node --env-file=config/falla.env --test --test-reporter=spec test/escenario-qa3.test.js",
+    "medir": "node --env-file=config/normal.env scripts/medir.js && node --env-file=config/falla.env scripts/medir.js"
   }
 }
