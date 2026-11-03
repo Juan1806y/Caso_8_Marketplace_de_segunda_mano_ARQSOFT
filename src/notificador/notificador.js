@@ -1,12 +1,16 @@
 // Notificador: consume MensajeNuevo y le avisa al destinatario ausente por push o correo.
 // Habla con el proveedor solo a través del puerto proveedor.enviar(aviso): no sabe si es el real o el simulado.
 //
-// Versión inicial, sin tácticas: si el proveedor falla, registra el error y confirma igual al broker.
-// Tampoco es idempotente, aunque el ADR-001 lo exige: un mensaje que el broker reentrega se avisaría dos veces.
-// En esta versión el rojo son los avisos perdidos; los duplicados aparecen al aplicar el reintento (T1), y
-// el ADR-003 decide cómo se corrigen y cuánto cuesta.
+// T1 · Reintento con espera creciente y tope (táctica de disponibilidad: recuperar).
+// Si el proveedor falla, el mensaje NO se confirma: el broker lo vuelve a entregar después de una espera
+// que se duplica (0,5 s, 1 s, 2 s) hasta un tope de 4 s. El tope sale de la medida de QA-3: con 4 s,
+// un aviso pendiente sale unos 4 s después de que el proveedor vuelve, por debajo de los 10 s.
+const ESPERA_INICIAL_MS = 500;
+const ESPERA_TOPE_MS = 4_000;
+const esperaParaElIntento = (intento) => Math.min(ESPERA_INICIAL_MS * 2 ** (intento - 1), ESPERA_TOPE_MS);
+
 export function crearNotificador({ broker, proveedor, log = console }) {
-  broker.suscribir('mensaje.nuevo', async ({ datos }) => {
+  broker.suscribir('mensaje.nuevo', async ({ datos, intento }) => {
     try {
       await proveedor.enviar({
         idMensaje: datos.idMensaje,
@@ -14,8 +18,9 @@ export function crearNotificador({ broker, proveedor, log = console }) {
         texto: 'Tienes un mensaje nuevo en el marketplace',
       });
     } catch (error) {
-      log.warn(`No se pudo avisar del mensaje ${datos.idMensaje}: ${error.message}`);
+      log.warn(`No se pudo avisar del mensaje ${datos.idMensaje} (intento ${intento}): ${error.message}`);
+      return { reintentarEn: esperaParaElIntento(intento) }; // sin confirmar: el broker lo vuelve a entregar
     }
-    // Al terminar sin lanzar error, el broker da el mensaje por confirmado y lo olvida.
+    // Al terminar sin error, el broker da el mensaje por confirmado y lo olvida.
   });
 }
