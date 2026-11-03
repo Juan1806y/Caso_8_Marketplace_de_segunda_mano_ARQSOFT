@@ -48,7 +48,11 @@ El diagrama de contexto corresponde al nivel 1 del modelo C4: el sistema como ca
 
 **La decisión que tomamos al dibujarlo: qué quedó por fuera de la frontera.** Lo más difícil no fue decidir qué dibujar sino qué no. El índice de búsqueda y el almacenamiento y distribución de las fotos quedaron por fuera. Es lo que más discutimos, porque son las dos piezas que dominan el caso: el índice sostiene la búsqueda de menos de un segundo y las imágenes dominan el almacenamiento y el ancho de banda. No entraron porque no son interlocutores del sistema: son partes de él. Dibujarlas en el nivel 1 habría contestado en el primer diagrama dos preguntas que el caso deja abiertas para los ADR (cómo se sincroniza el índice con el inventario y cuál es el ciclo de vida de una imagen) y habría convertido el diagrama de contexto en un diagrama de contenedores mal hecho. Aparecen en el nivel 2, después del ADR-002 y del ADR-003.
 
+> **Nota (noviembre de 2026).** El curso asignó el ADR-002 al componente con modelo de lenguaje y el ADR-003 a la táctica del escenario probado. La sincronización del índice quedó decidida en el ADR-001 y el índice ya aparece en la vista de contenedores; el ciclo de vida de las imágenes queda para un ADR posterior.
+
 Por la misma regla dejamos fuera la pasarela de pagos, que habría sido inventar alcance, y al equipo de soporte, cuyo acceso pasa siempre por un reporte y por lo tanto por el rol Moderador. Y el que casi se nos escapa hacia el otro lado: el servicio de notificaciones sí entró, porque es el único sistema externo del caso y porque su modo de falla importa: si el proveedor está caído, el chat debe seguir funcionando y el aviso al ausente debe quedar pendiente, no perdido.
+
+> **Nota (noviembre de 2026).** El ADR-002 añade un segundo sistema externo: el proveedor del modelo de lenguaje.
 
 ## Pregunta 4. Primer escenario de calidad: la tensión principal
 
@@ -99,6 +103,8 @@ El presupuesto es asimétrico a propósito. Que una publicación tarde 30 s en a
 **Decisión:** monolito modular como unidad de despliegue del dominio del catálogo, con una única excepción declarada: el chat en su propia unidad. Dos unidades desplegables, no ocho.
 
 Conviene precisar qué se está decidiendo. Los patrones no compiten entre sí: responden preguntas distintas y se ordenan en tres ejes (cómo se despliega el sistema, cómo se organiza el código por dentro y cómo se hablan las piezas), y un sistema real elige uno por eje. Esta es una decisión del primer eje, y solo de ese eje. La organización interna del código y la forma en que las piezas se hablan son decisiones de los otros dos ejes, que se toman en el ADR-001 y en el ADR-002 y que la Pregunta 7 anticipa. Y esto no es «arquitectura de microservicios»: microservicios es un patrón del mismo eje que no elegimos. La justificación no puede ser una preferencia, porque en arquitectura no hay opciones buenas y malas en abstracto: hay compromisos, y la pregunta pertinente siempre es a costa de qué (Richards y Ford, 2025).
+
+> **Nota (noviembre de 2026).** La forma en que se hablan las piezas quedó en el ADR-001. La organización interna del código no tiene ADR propio todavía; el código de la Parte B del segundo previo deja al proveedor de notificaciones detrás de un puerto con su adaptador.
 
 **Lo que empuja hacia el monolito.** Publicación, búsqueda, favoritos, reputación y moderación comparten el mismo dato (la publicación y el usuario) y el mismo perfil de carga: petición y respuesta cortas, sin estado entre llamadas. Separarlos hoy sustituiría llamadas locales por llamadas de red y consistencia distribuida entre piezas que se consultan entre sí en casi cada operación, y pondría a un equipo pequeño a operar N servicios. Con la eficiencia de costo como QA-2, eso es exactamente lo que el proyecto no puede pagar. Fowler (2015) formula el mismo argumento como regla práctica: empezar por el monolito y extraer después lo que la evidencia obligue a extraer.
 
