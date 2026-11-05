@@ -24,7 +24,7 @@ Para ver la prueba en rojo, antes de la táctica: `git checkout sin-tactica` y `
 
 ## Video de sustentación
 
-Enlace pendiente: se agrega cuando el video esté en YouTube (oculto).
+Enlace: https://youtu.be/c5XVvg50lpU 
 
 ## Quién hizo qué
 
